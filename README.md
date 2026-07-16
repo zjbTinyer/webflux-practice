@@ -310,7 +310,7 @@ merge: 谁先好谁先走 → 交替输出
 | HTTP 客户端 | Reactor Netty | - |
 | 构建工具 | Maven | 3.x |
 | Java | JDK | 17+ |
-| 前端框架 | React | 18.3 |
+| 前端框架 | React | 19.2 |
 | 语言 | TypeScript | 5.5 |
 | 构建工具 | Vite | 5.4 |
 | Node.js | 运行时 | 24+（系统安装） |
