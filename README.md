@@ -1,13 +1,13 @@
 # ⚡ WebFlux 响应式编程练习项目
 
-Spring Boot 3.2 + WebFlux + R2DBC + H2 后端 | React 18 + TypeScript 前端
+Spring Boot 3.2 + WebFlux + R2DBC + H2 后端 | React 19 + TypeScript 前端
 
 ## 📖 项目简介
 
 本项目是一个**全栈响应式编程练习项目**，旨在全面掌握 Spring WebFlux 和 Reactor 的响应式编程范式。项目包含：
 
 - 🔙 **后端**：Spring Boot 3.2 + WebFlux + R2DBC + H2 内存数据库
-- 🔜 **前端**：React 18 + TypeScript + Vite
+- 🔜 **前端**：React 19 + TypeScript + Vite
 - 🌐 **通信**：RESTful API + SSE（Server-Sent Events）+ WebSocket
 
 后端所有接口返回类型都是 `Mono<T>` 或 `Flux<T>`，涵盖了 Reactive Streams 的绝大多数操作符，每个方法都有详细的中文注释解释操作符用途。
