@@ -20,8 +20,8 @@ Spring Boot 3.2 + WebFlux + R2DBC + H2 后端 | React 18 + TypeScript 前端
 
 - JDK 17+
 - Maven 3.8+
-- Node.js 18+
-- npm 9+
+- Node.js 24+（使用机器安装的版本：`node --version`）
+- npm 11+（随 Node.js 自带）
 
 ### 1. 启动后端（端口 8080）
 
@@ -312,7 +312,9 @@ merge: 谁先好谁先走 → 交替输出
 | Java | JDK | 17+ |
 | 前端框架 | React | 18.3 |
 | 语言 | TypeScript | 5.5 |
-| 构建工具 | Vite | 5.3 |
+| 构建工具 | Vite | 5.4 |
+| Node.js | 运行时 | 24+（系统安装） |
+| npm | 包管理器 | 11+（系统安装） |
 | 代理 | Vite Proxy | - |
 
 ---
