@@ -1,28 +1,50 @@
+# ============================================================================
+# WebFlux 项目 — 通用配置（所有 profile 共享）
+# ============================================================================
+
 server:
   port: 8080
 
 spring:
-  # ========== R2DBC 配置 ==========
-  # 使用 H2 嵌入式数据库 + R2DBC 协议（响应式数据库连接）
-  r2dbc:
-    url: r2dbc:h2:mem:///webfluxdb;DB_CLOSE_DELAY=-1  # 内存数据库，应用关闭前数据保留
-    username: sa
-    password:
-
-  # ========== H2 Web Console (调试用) ==========
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
-
-  # ========== SQL 初始化 ==========
+  # ========== 禁用 spring.sql.init（改用 Flyway） ==========
   sql:
     init:
-      mode: always  # always=每次启动都执行 schema.sql
-      schema-locations: classpath:schema.sql
+      mode: never
+
+  # ========== Flyway 迁移（默认启用，test profile 关闭） ==========
+  flyway:
+    enabled: true
+
+# ========== Actuator 健康检查 ==========
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,info,env,loggers
+  endpoint:
+    health:
+      show-details: when-authorized
+  info:
+    env:
+      enabled: true
+
+# ========== SpringDoc OpenAPI (Swagger UI) ==========
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    groups-order: ASC
+  show-actuator: true
+  group-configs:
+    - group: api
+      paths-to-match: /api/users/**, /api/func/**
+    - group: demo
+      paths-to-match: /api/demo/**
 
 # ========== 日志 ==========
 logging:
   level:
-    com.example.webflux: DEBUG  # 项目包的日志级别设为 DEBUG，方便观察响应式流
-    org.springframework.r2dbc: DEBUG  # 输出 R2DBC SQL 日志
+    com.example.webflux: DEBUG
+    org.springframework.r2dbc: DEBUG
+    reactor: INFO

@@ -1,0 +1,17 @@
+# ============================================================================
+# Docker / Production Profile — 使用 PostgreSQL
+# 启动: docker compose up
+# ============================================================================
+spring:
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/webfluxdb
+    username: webflux
+    password: ${DB_PASSWORD}
+
+  flyway:
+    locations: classpath:db/migration/postgresql
+
+logging:
+  level:
+    com.example.webflux: INFO
+    org.springframework.r2dbc: WARN

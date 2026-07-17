@@ -1,5 +1,6 @@
 package com.example.webflux.service.impl;
 
+import com.example.webflux.dto.PageResponse;
 import com.example.webflux.dto.UserDTO;
 import com.example.webflux.entity.User;
 import com.example.webflux.repository.UserRepository;
@@ -336,6 +337,42 @@ public class UserServiceImpl implements UserService {
     public Mono<Long> count() {
         return userRepository.count()
                 .doOnNext(c -> log.debug("📊 [count] 用户总数: {}", c));
+    }
+
+    /**
+     * 📄 分页查询 —— 生产级分页 API
+     *
+     * <p>使用 {@code Mono.zip} 并行获取"当前页数据"和"总记录数"，
+     * 组装成 PageResponse 返回。两个查询是并行执行的，互不阻塞。
+     *
+     * <p>R2DBC 不支持 Spring Data 的 {@code Pageable}，
+     * 需要手动计算 offset 并使用 LIMIT/OFFSET。
+     */
+    @Override
+    public Mono<PageResponse<User>> findAllPaged(int page, int size) {
+        long offset = (long) page * size;
+
+        Mono<java.util.List<User>> contentMono = userRepository.findAllPaged(size, offset)
+                .collectList();
+        Mono<Long> totalMono = userRepository.count();
+
+        // zip: 并行获取两个异步结果，等两个都完成后组装
+        return Mono.zip(contentMono, totalMono)
+                .doOnSubscribe(s -> log.debug("📄 [findAllPaged] page={}, size={}", page, size))
+                .map(tuple -> {
+                    java.util.List<User> content = tuple.getT1();
+                    long total = tuple.getT2();
+                    int totalPages = (int) Math.ceil((double) total / size);
+                    return PageResponse.<User>builder()
+                            .content(content)
+                            .page(page)
+                            .size(size)
+                            .totalElements(total)
+                            .totalPages(totalPages)
+                            .first(page == 0)
+                            .last(page >= totalPages - 1)
+                            .build();
+                });
     }
 
     // ======================================================================

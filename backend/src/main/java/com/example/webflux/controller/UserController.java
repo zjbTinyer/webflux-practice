@@ -9,12 +9,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.time.Duration;
 
 /**
  * 用户 Controller（注解方式）
@@ -45,7 +42,6 @@ import java.time.Duration;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")  // 允许前端跨域访问
 public class UserController {
 
     private final UserServiceImpl userService;
@@ -83,15 +79,24 @@ public class UserController {
     }
 
     /**
-     * 📌 查询全部用户 —— 返回 Flux<User>（不是 Mono<List<User>>！）
+     * 📌 查询全部用户（分页）
      *
-     * <p>GET /api/users
-     *
-     * <p><b>重要：</b>WebFlux 中 Flux 作为返回值时，框架会逐个序列化元素。
-     * 客户端收到的仍是完整的 JSON 数组。
-     * 如果想真正流式发送（SSE），需要使用 {@code MediaType.TEXT_EVENT_STREAM_VALUE}。
+     * <p>GET /api/users?page=0&size=10
+     * <p>不传参数时默认返回第 0 页、每页 10 条
      */
     @GetMapping
+    public Mono<Result<com.example.webflux.dto.PageResponse<User>>> findAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return userService.findAllPaged(page, size).map(Result::ok);
+    }
+
+    /**
+     * 📌 查询全部用户（不分页，Flux 模式）
+     *
+     * <p>GET /api/users/all
+     */
+    @GetMapping("/all")
     public Flux<User> findAll() {
         return userService.findAll();
     }
@@ -207,88 +212,5 @@ public class UserController {
     @PostMapping("/batch")
     public Flux<User> batchCreate(@Valid @RequestBody Flux<UserDTO> dtoStream) {
         return userService.batchCreate(dtoStream);
-    }
-
-    // ======================================================================
-    // 五、综合演示
-    // ======================================================================
-
-    /**
-     * 🧪 zip 合并演示 —— GET /api/users/demo/zip
-     */
-    @GetMapping("/demo/zip")
-    public Mono<Result<String>> zipDemo() {
-        return userService.zipDemo().map(Result::ok);
-    }
-
-    /**
-     * 🧪 merge 合并演示（SSE 输出，可以看到交错效果）
-     *
-     * <p>GET /api/users/demo/merge
-     */
-    @GetMapping(value = "/demo/merge", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<String> mergeDemo() {
-        return userService.mergeDemo();
-    }
-
-    /**
-     * 🧪 collectList 演示 —— GET /api/users/demo/collect
-     */
-    @GetMapping("/demo/collect")
-    public Mono<Result<String>> collectDemo() {
-        return userService.collectListDemo().map(Result::ok);
-    }
-
-    /**
-     * 🧪 错误处理演示 —— GET /api/users/demo/error/{id}
-     */
-    @GetMapping("/demo/error/{id}")
-    public Mono<Result<User>> errorHandlingDemo(@PathVariable Long id) {
-        return userService.errorHandlingDemo(id).map(Result::ok);
-    }
-
-    /**
-     * 🧪 调度器演示 —— GET /api/users/demo/scheduler
-     */
-    @GetMapping("/demo/scheduler")
-    public Mono<Result<String>> schedulerDemo() {
-        return userService.schedulerDemo().map(Result::ok);
-    }
-
-    /**
-     * 🧪 Context 演示 —— GET /api/users/demo/context
-     */
-    @GetMapping("/demo/context")
-    public Mono<Result<String>> contextDemo() {
-        return userService.contextDemo()
-                // 【contextWrite 操作符】向响应式链中写入 Context
-                .contextWrite(ctx -> ctx.put("traceId", "trace-2024-001"))
-                .map(Result::ok);
-    }
-
-    // ======================================================================
-    // 六、全局异常处理
-    // ======================================================================
-
-    /**
-     * 🛡️ 全局异常处理器
-     *
-     * <p>在 WebFlux 中，可以像 Spring MVC 一样使用 @ExceptionHandler，
-     * 但返回值需要是 Mono<Result<T>>。
-     *
-     * <p>对于校验异常（WebExchangeBindException），我们提取字段级错误信息。
-     */
-    @ExceptionHandler(IllegalArgumentException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Mono<Result<Void>> handleIllegalArgument(IllegalArgumentException e) {
-        log.warn("⚠️  [ExceptionHandler] 参数错误: {}", e.getMessage());
-        return Mono.just(Result.badRequest(e.getMessage()));
-    }
-
-    @ExceptionHandler(RuntimeException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public Mono<Result<Void>> handleRuntime(RuntimeException e) {
-        log.error("❌ [ExceptionHandler] 运行时错误: {}", e.getMessage(), e);
-        return Mono.just(Result.serverError(e.getMessage()));
     }
 }

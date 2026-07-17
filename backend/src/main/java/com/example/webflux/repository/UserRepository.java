@@ -59,4 +59,11 @@ public interface UserRepository extends R2dbcRepository<User, Long> {
      */
     @Query("SELECT * FROM users WHERE name = :name AND age >= :age")
     Flux<User> findByNameAndMinAge(String name, int age);
+
+    /**
+     * 📄 分页查询 — 按 ID 降序排列
+     * R2DBC 使用 OFFSET/LIMIT 实现分页（类似 SQL 标准语法）
+     */
+    @Query("SELECT * FROM users ORDER BY id DESC LIMIT :size OFFSET :offset")
+    Flux<User> findAllPaged(int size, long offset);
 }

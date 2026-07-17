@@ -30,5 +30,15 @@ dist/
 *~
 .DS_Store
 
+# ===== Logs =====
+logs/
+*.log
+
+# ===== Docker =====
+docker-compose.override.yml
+
+# ===== Environment =====
+.env
+
 # ===== OS =====
 Thumbs.db

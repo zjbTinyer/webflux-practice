@@ -1,5 +1,6 @@
 package com.example.webflux.service;
 
+import com.example.webflux.dto.PageResponse;
 import com.example.webflux.dto.UserDTO;
 import com.example.webflux.entity.User;
 import reactor.core.publisher.Flux;
@@ -51,4 +52,9 @@ public interface UserService {
 
     /** 获取用户总数（演示多个 Mono 组合） */
     Mono<Long> count();
+
+    // ========== 分页查询 ==========
+
+    /** 分页查询所有用户（生产级 API，Mono.zip 合并内容与总数） */
+    Mono<PageResponse<User>> findAllPaged(int page, int size);
 }

@@ -5,24 +5,23 @@ import com.example.webflux.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 
 import java.time.LocalDateTime;
 
 /**
- * 数据初始化器
+ * 数据初始化器（仅 dev profile 生效）
  *
  * <p>实现 CommandLineRunner 在应用启动后自动执行，
- * 向 H2 内存数据库中插入示例数据，方便练习。
+ * 向 H2 内存数据库中插入示例数据，方便开发调试。
  *
- * <h3>响应式批量插入</h3>
- * 用 {@code Flux.just(...).concatMap(repo::save)} 实现顺序批量插入。
- *
- * <p>concatMap 保证按顺序保存，如果用 flatMap 则会并行保存（顺序不确定）。
+ * <p>{@code @Profile("dev")} 确保在生产环境（docker profile）不会插入测试数据。
  */
 @Slf4j
 @Component
+@Profile("dev")
 @RequiredArgsConstructor
 public class DataInitializer implements CommandLineRunner {
 

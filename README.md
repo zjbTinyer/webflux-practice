@@ -1,56 +1,54 @@
-# ⚡ WebFlux 响应式编程练习项目
+# ⚡ WebFlux 响应式编程项目
 
-Spring Boot 3.2 + WebFlux + R2DBC + H2 后端 | React 19 + TypeScript 前端
+Spring Boot 3.2 + WebFlux + R2DBC + PostgreSQL | React 19 + TypeScript + Tailwind CSS
 
 ## 📖 项目简介
 
-本项目是一个**全栈响应式编程练习项目**，旨在全面掌握 Spring WebFlux 和 Reactor 的响应式编程范式。项目包含：
+全栈响应式编程项目，涵盖 WebFlux/Reactor 核心操作符实战。支持 **H2 快速开发** 和 **PostgreSQL 生产部署** 两种模式。
 
-- 🔙 **后端**：Spring Boot 3.2 + WebFlux + R2DBC + H2 内存数据库
-- 🔜 **前端**：React 19 + TypeScript + Vite
-- 🌐 **通信**：RESTful API + SSE（Server-Sent Events）+ WebSocket
-
-后端所有接口返回类型都是 `Mono<T>` 或 `Flux<T>`，涵盖了 Reactive Streams 的绝大多数操作符，每个方法都有详细的中文注释解释操作符用途。
+- 🔙 **后端**：Spring Boot 3.2 + WebFlux + R2DBC + Flyway 迁移 + SpringDoc + Actuator
+- 🔜 **前端**：React 19 + TypeScript + Tailwind CSS + shadcn/ui + React Router + TanStack Query
+- 🌐 **通信**：RESTful API + SSE + WebSocket
+- 🐳 **部署**：Docker Compose 一键启动（PostgreSQL + Backend + Nginx Frontend）
 
 ---
 
 ## 🚀 快速启动
 
-### 环境要求
-
-- JDK 17+
-- Maven 3.8+
-- Node.js 24+（使用机器安装的版本：`node --version`）
-- npm 11+（随 Node.js 自带）
-
-### 1. 启动后端（端口 8080）
+### 方式一：Docker Compose（推荐，一键启动）
 
 ```bash
-cd backend
-mvn spring-boot:run
+cp .env.example .env
+docker compose up -d
 ```
 
-启动后会自动：
-- 执行 `schema.sql` 创建 `users` 表
-- 通过 `DataInitializer` 插入 8 条示例数据
+访问 `http://localhost`，所有服务自动启动。
 
-验证后端启动成功：
+### 方式二：本地开发（H2 内存数据库）
+
+**环境要求**：JDK 17+ / Maven 3.8+ / Node.js 24+ / npm 11+
+
+**启动后端（端口 8080）**：
+```bash
+cd backend && mvn spring-boot:run
+```
+启动后 Flyway 自动建表，DataInitializer 插入 8 条测试数据。
+
+**启动前端（端口 3000）**：
+```bash
+cd frontend && npm install && npm run dev
+```
+访问 `http://localhost:3000`。
+
+### 运行测试
 
 ```bash
-curl http://localhost:8080/api/users
+# 后端测试
+cd backend && mvn test
+
+# 前端测试
+cd frontend && npm test
 ```
-
-### 2. 启动前端（端口 3000）
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-浏览器访问 `http://localhost:3000`。
-
-前端通过 Vite 代理将 `/api` 和 `/ws` 请求转发到后端 8080 端口。
 
 ---
 
@@ -305,33 +303,34 @@ merge: 谁先好谁先走 → 交替输出
 | 后端框架 | Spring Boot | 3.2.5 |
 | 响应式 Web | Spring WebFlux | 6.1.6 |
 | 响应式 ORM | Spring Data R2DBC | 3.2.5 |
-| 数据库驱动 | r2dbc-h2 | 1.0.0 |
-| 数据库 | H2（内存模式） | 2.2.224 |
+| 数据库迁移 | Flyway | 自动建表 |
+| 数据库(dev) | H2 | 内存模式 |
+| 数据库(prod) | PostgreSQL | 16 (Docker) |
+| API 文档 | SpringDoc OpenAPI | 2.5.0 |
+| 监控 | Actuator | Health/Metrics |
 | HTTP 客户端 | Reactor Netty | - |
 | 构建工具 | Maven | 3.x |
 | Java | JDK | 17+ |
 | 前端框架 | React | 19.2 |
+| UI 组件 | shadcn/ui + Tailwind | 3.x |
+| 状态管理 | TanStack Query | 5.x |
+| 路由 | React Router | 7.x |
 | 语言 | TypeScript | 5.5 |
 | 构建工具 | Vite | 5.4 |
 | Node.js | 运行时 | 24+（系统安装） |
-| npm | 包管理器 | 11+（系统安装） |
-| 代理 | Vite Proxy | - |
+| 部署 | Docker Compose | 3.8 |
 
 ---
 
-## 📝 学习路径建议
+## 📡 生产级端点
 
-1. **入门**：先读 `UserServiceImpl` 的前几个方法，理解 `map`、`flatMap`、`Mono`、`Flux` 的基本用法
-2. **进阶**：研究 `batchCreate` 理解 `concatMap` vs `flatMap` 的区别
-3. **错误处理**：看 `findByIdWithFallback` 和 `errorHandlingDemo` 理解错误处理链路
-4. **组合**：看 `zipDemo`、`mergeDemo` 理解多流合并
-5. **SSE**：启动后端，用前端 SSE 组件观察流式数据推送
-6. **WebSocket**：用多浏览器窗口连接 `/ws/chat` 体验响应式群聊
-7. **函数式端点**：对比 `UserController`（注解）和 `UserHandler + RouterConfig`（函数式）两种写法
-8. **工具类**：运行 `ReactiveUtils` 中的独立示例
-
----
+| 端点 | 说明 |
+|------|------|
+| Swagger UI | `http://localhost:8080/swagger-ui.html` |
+| API Docs | `http://localhost:8080/api-docs` |
+| Health | `http://localhost:8080/actuator/health` |
+| Metrics | `http://localhost:8080/actuator/metrics` |
 
 ## 📄 License
 
-MIT — 仅供学习练习使用
+MIT

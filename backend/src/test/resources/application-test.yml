@@ -1,0 +1,15 @@
+spring:
+  r2dbc:
+    url: r2dbc:h2:mem:///testdb;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+  flyway:
+    enabled: false
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:db/migration/h2/V1__create_users_table.sql
+
+logging:
+  level:
+    com.example.webflux: DEBUG
