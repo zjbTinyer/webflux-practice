@@ -58,50 +58,70 @@ cd frontend && npm test
 webflux-practice/
 ├── README.md
 ├── .gitignore
+├── .env.example
+├── docker-compose.yml
 ├── backend/                                  # Spring Boot 后端
-│   ├── pom.xml                               # Maven 配置
-│   └── src/main/java/com/example/webflux/
-│       ├── WebfluxPracticeApplication.java   # 启动类
-│       ├── config/
-│       │   ├── DataInitializer.java          # 数据初始化（8条用户）
-│       │   ├── RouterConfig.java             # 函数式端点路由配置
-│       │   ├── WebClientConfig.java          # WebClient Bean 配置
-│       │   └── WebSocketConfig.java          # WebSocket 路由映射
-│       ├── controller/
-│       │   └── UserController.java           # 注解方式 Controller
-│       ├── dto/
-│       │   ├── Result.java                   # 统一响应体
-│       │   └── UserDTO.java                  # 用户 DTO
-│       ├── entity/
-│       │   └── User.java                     # 用户实体
-│       ├── handler/
-│       │   ├── UserHandler.java              # 函数式端点 Handler
-│       │   └── ReactiveWebSocketHandler.java # WebSocket 处理器
-│       ├── repository/
-│       │   └── UserRepository.java           # R2DBC 响应式仓库
-│       ├── service/
-│       │   ├── UserService.java              # 服务接口
-│       │   └── impl/
-│       │       └── UserServiceImpl.java      # 核心实现（20+ 操作符）
-│       └── util/
-│           └── ReactiveUtils.java            # 独立操作符演示工具类
-└── frontend/                                 # React 前端
+│   ├── Dockerfile
+│   ├── pom.xml
+│   └── src/
+│       ├── main/java/com/example/webflux/
+│       │   ├── WebfluxPracticeApplication.java
+│       │   ├── config/
+│       │   │   ├── CorsConfig.java            # 全局 CORS（替代 @CrossOrigin）
+│       │   │   ├── DataInitializer.java       # 种子数据（仅 dev profile）
+│       │   │   ├── GlobalExceptionHandler.java # @RestControllerAdvice
+│       │   │   ├── RouterConfig.java          # 函数式端点路由
+│       │   │   ├── WebClientConfig.java       # WebClient Bean
+│       │   │   └── WebSocketConfig.java       # WebSocket 映射
+│       │   ├── controller/
+│       │   │   ├── UserController.java        # 用户 CRUD + 分页 + SSE
+│       │   │   └── DemoController.java        # WebFlux 操作符演示
+│       │   ├── dto/
+│       │   │   ├── PageResponse.java          # 分页响应
+│       │   │   ├── Result.java                # 统一响应体
+│       │   │   └── UserDTO.java
+│       │   ├── entity/User.java
+│       │   ├── handler/
+│       │   │   ├── ReactiveWebSocketHandler.java
+│       │   │   └── UserHandler.java
+│       │   ├── repository/UserRepository.java # R2DBC
+│       │   ├── service/
+│       │   │   ├── UserService.java
+│       │   │   └── impl/UserServiceImpl.java  # 20+ 操作符
+│       │   └── util/ReactiveUtils.java
+│       ├── main/resources/
+│       │   ├── application.yml                # 通用配置
+│       │   ├── application-dev.yml            # H2 开发环境
+│       │   ├── application-docker.yml         # PostgreSQL 生产环境
+│       │   ├── db/migration/                  # Flyway 迁移脚本
+│       │   │   ├── h2/V1__create_users_table.sql
+│       │   │   └── postgresql/V1__create_users_table.sql
+│       │   └── logback-spring.xml
+│       └── test/                              # 12 个测试
+│           ├── java/com/example/webflux/
+│           │   ├── controller/UserControllerIntegrationTest.java
+│           │   └── service/impl/UserServiceImplTest.java
+│           └── resources/application-test.yml
+└── frontend/                                 # React 19 前端
+    ├── Dockerfile
+    ├── nginx.conf
     ├── package.json
-    ├── vite.config.ts                        # Vite 配置（含代理）
-    ├── tsconfig.json
+    ├── tailwind.config.ts
+    ├── vite.config.ts
     └── src/
-        ├── main.tsx                          # 入口
-        ├── App.tsx                           # 主应用组件
-        ├── App.css                           # 全局样式
-        ├── api/
-        │   └── userApi.ts                    # API 请求封装
-        ├── hooks/
-        │   └── useSSE.ts                     # SSE 消费 Hook
-        └── components/
-            ├── UserList.tsx                  # 用户列表
-            ├── UserForm.tsx                  # 创建/编辑表单
-            ├── SSEDisplay.tsx                # SSE 数据展示
-            └── DemoPanel.tsx                 # 操作符演示面板
+        ├── main.tsx                          # BrowserRouter + QueryClient
+        ├── App.tsx                           # React Router 路由
+        ├── index.css                         # Tailwind CSS 入口
+        ├── lib/utils.ts                      # cn() 工具
+        ├── api/userApi.ts                    # 类型定义
+        ├── hooks/useSSE.ts                   # SSE Hook
+        ├── components/
+        │   ├── layout/{Layout,Sidebar}.tsx   # 侧边栏布局
+        │   └── ui/{button,card,input,...}.tsx # shadcn/ui 组件
+        └── pages/
+            ├── HomePage.tsx                  # 首页
+            ├── UsersPage.tsx                 # 用户管理（分页+CRUD）
+            └── DemoPage.tsx                  # SSE + 操作符演示
 ```
 
 ---

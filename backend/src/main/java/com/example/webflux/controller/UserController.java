@@ -31,9 +31,8 @@ import reactor.core.publisher.Mono;
  *
  * <h2>本 Controller 涵盖的特性</h2>
  * <ul>
- *   <li>基础 CRUD（Mono/Flux 返回值）</li>
+ *   <li>基础 CRUD + 分页查询（Mono/Flux 返回值）</li>
  *   <li>SSE（Server-Sent Events）流式推送</li>
- *   <li>全局异常处理（@ExceptionHandler）</li>
  *   <li>请求参数校验（@Valid）</li>
  *   <li>批量操作</li>
  * </ul>
